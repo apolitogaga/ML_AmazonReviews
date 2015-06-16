@@ -1,0 +1,18 @@
+{
+    "contents" : "install.packages(\"foreign\")\n \nlibrary(foreign)\ninstall.packages(\"RWeka\")\nlibrary(RWeka)\n\nread.arff(\"data/wise2014-train.arff\")\ndata<- read.arff(\"data/amazon-commerce-reviews.arff\")\n\ndata2 <- read.arff(\"data/amRevData1.arff\")#Amazon_initial_50_30_10000\n?read.arff\ngetwd()\n",
+    "created" : 1429087931782.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "732155715",
+    "id" : "C768E72A",
+    "lastKnownWriteTime" : 1434459615,
+    "path" : "~/Google Drive/Documentos/Escuela/MIRI/UPC/2/MachineLearning/Project/AmazonReviews/ML_AmRev_R.R",
+    "project_path" : "ML_AmRev_R.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 0,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
