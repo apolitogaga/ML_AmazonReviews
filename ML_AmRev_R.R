@@ -4,10 +4,55 @@ library(foreign)
 str(data)
 #### UNIX COMMMAND TO REMOVE THE CTRL character from the file.###########
 ## cat -v data/amRevData.arff | sed 's/\^A/\t/g' > data/test.arff 
-dataFFF <- read.arff("data/cleanedAmazon.arff")
-data2 <- read.arff("data/authoS/amazon-commerce-reviews.arff")#Amazon_initial_50_30_10000
-data3 <- read.arff("data/authorDS/charactersdataset_20_50.arff")
-data4 <- read.arff("data/authorDS/charactersdataset_30_50.arff")
+
+#data <- read.arff("data/cleanedAmazon.arff")
+#saveRDS(data,"data/initialData.rds")
+data <- readRDS("data/initialData.rds")
+
+
+############### Separate test/training data ###############
+##  FROM: http://stackoverflow.com/questions/13536537/partitioning-data-set-in-r-based-on-multiple-classes-of-observations
+# we have a variable class, which is a 
+names(data)[10001] <- "clazz"
+data$clazz
+
+# sample 67 training rows within classification groups
+training.rows <-
+  tapply( 
+    # numeric vector containing the numbers
+    # 1 to nrow( x )
+    1:nrow( data ) , 
+    
+    # break the sample function out by
+    # the classification variable
+    data$clazz , 
+    
+    # use the sample function within
+    # each classification variable group
+    sample , 
+    
+    # send the size = 67 parameter
+    # through to the sample() function
+    size = 25 
+  )
+
+# convert list back to a numeric vector
+tr <- unlist( training.rows )
+
+# split original data frame into two:
+
+# all the records sampled as training rows
+training.df <- data[ tr , ]
+
+# all other records (NOT sampled as training rows)
+testing.df <- data[ -tr , ]
+######## Checkpoint 2 get the data.
+#saveRDS(training.df,"data/trainingData.rds")
+#saveRDS(testing.df,"data/testingData.rds")
+training.df <- readRDS("data/trainingData.rds")
+testing.df <- readRDS("data/testingData.rds")
+######## end the merging of data
+
 
 levels(data3$class)
 plot(data3$class)
