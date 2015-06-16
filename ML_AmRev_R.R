@@ -4,7 +4,6 @@ library(foreign)
 str(data)
 #### UNIX COMMMAND TO REMOVE THE CTRL character from the file.###########
 ## cat -v data/amRevData.arff | sed 's/\^A/\t/g' > data/test.arff 
-<<<<<<< HEAD
 
 #data <- read.arff("data/cleanedAmazon.arff")
 #saveRDS(data,"data/initialData.rds")
@@ -60,7 +59,6 @@ levels(data$class)
 plot(data$class)
 head(data)
 names(data)
-=======
 data <- read.arff("data/cleanedAmazon.arff")
 
 levels(data$class)
@@ -73,7 +71,6 @@ data<- read.arff("data/amazon-commerce-reviews.arff")
 attributes(data3)
 names(data)
 plot(data$Class)
->>>>>>> origin/miML
 target.reviewer<-data[,10001]
 dim(data)
 
