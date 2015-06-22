@@ -168,7 +168,7 @@ datacomplete<-data.frame(data.tfidf.3,target.class1)
 #-----------PCA-------------------------------
 
 library(FactoMineR)
-PCAnew <- PCA(datacomplete,quali.sup=c(ncol(datacomplete)),ncp=500) # retain the first 500 PCs
+PCAnew <- PCA(datacomplete,quali.sup=c(ncol(datacomplete)),ncp=500,scale.unit=TRUE) # retain the first 500 PCs
 summary(PCAnew)
 plot(PCAnew$eig$eigenvalue,type="l",main="Screeplot")
 #Psiframe<-data.frame(target.class1,PCAnew$ind$coord[,1:500])
@@ -379,7 +379,6 @@ Testing.PCA.SVM
 Testing.Relief.SVM
 library(xtable)
 
-import 
 print(xtable(Testing.PCA.rf))
 
 print(xtable(Testing.Relief.rf))
