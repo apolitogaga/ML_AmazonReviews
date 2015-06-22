@@ -1,21 +1,130 @@
+#########################################################################################################
+#                                                                                                       #
+#                                                                                                       #
+#                                        Barcelonatech                                                  #
+#                                  Machine Learning Project                                             #
+#                                Miguel Mossa & Apolo Rosales                                           #
+#                                     DR. Lluís Belanche                                                #
+#                                                                                                       #
+#                                                                                                       #  
+#########################################################################################################
+
+
+library(foreign)
+library(ggplot2)
+library(wordcloud)
+library("tm")
+library(SnowballC)
+library(kernlab)
+
+
 #ANALYSIS EXPLORATORY AND PRE-PROCESSING
 data<- train10.df
 
+
+################################################################################################################################################
+#---------AuxFunctions-------------------------------------------
+################################################################################################################################################
+harmDiagProb <-function(x){
+  var=1
+  i=0
+  for(i in i:nrow(x) )
+    var[i] <- prop.table(x,1)[i,i]
+  return(as.numeric(var))
+}
+
+doTheCloud <- function(data2,rand=FALSE){
+  v <- sort(colSums(data2[-ncol(data2)]),decreasing=TRUE)
+  pal2 <- brewer.pal(8,"Dark2")
+  d <- data.frame(word = colnames(data2[,-ncol(data2)]),freq=v/sum(v))
+  wordcloud(d$word,d$freq,scale=c(8,.3), random.order=rand, color=pal2)
+}
+
+
+################################################################################################################################################
+#---------Load and create test sets-------------------------------------------
+################################################################################################################################################
+
+data <- readRDS("data/initialData.rds")
+wholeData <- readRDS("data/initialData.rds")
+
+##  FROM: http://stackoverflow.com/questions/13536537/partitioning-data-set-in-r-based-on-multiple-classes-of-observations
+# sample 67 training rows within classification groups
+training.rows <-
+  tapply( 
+    # numeric vector containing the numbers
+    # 1 to nrow( x )
+    1:nrow( data10 ) , 
+    
+    # break the sample function out by
+    # the classification variable
+    data10$clazz , 
+    
+    # use the sample function within
+    # each classification variable group
+    sample , 
+    
+    # send the size = 67 parameter
+    # through to the sample() function
+    size = 25 
+  )
+
+# convert list back to a numeric vector
+tr <- unlist( training.rows )
+
+# split original data frame into two:
+
+# all the records sampled as training rows
+training10.df <- data10[ tr , ]
+
+# all other records (NOT sampled as training rows)
+testing10.df <- data10[ -tr , ]
+######## Checkpoint 2 get the data.
+#saveRDS(training10.df,"data/training10Data.rds")
+#saveRDS(testing10.df,"data/testing10Data.rds")
+training.df <- readRDS("data/trainingData.rds")
+testing.df <- readRDS("data/testingData.rds")
+train10.df <- readRDS("data/training10Data.rds")
+test10.df <- readRDS("data/testing10Data.rds")
+######## end the merging of data
+
+
+
 names(data)[10001] <- "clazz" # change the factor class to clazz
 matrixdata1<-as.matrix(data[-10001])
-class(matrixdata1)
-dim(matrixdata1)
 library(tm)
 library(wordcloud)
 
-N<-nrow(data)
-ntrain <- round(N*0.8)     # number of training examples
-tr <- sample(N,ntrain) # indices of training samples
+
+################################################################################################################################################
+#---------Word Cloud PLOT-------------------------------------------
+################################################################################################################################################
+
+
+for(i in 1:10000) var2[i] <- sum(wholeData[,i])
+plot(log(var2))
+# the different sets in our dataset
+data1<-cbind(wholeData[1:3558], wholeData[10001])
+data2<-cbind(wholeData[3559:5927], wholeData[10001])
+data3<-cbind(wholeData[5928:6566], wholeData[10001])
+data4<-wholeData[6567:ncol(wholeData)]
+doTheCloud(data1)
+doTheCloud(data2)
+doTheCloud(data3)
+doTheCloud(data4)
+
+
+
+
+tr <- row.names(training.df)
+dim(data[tr,])
+dim(data[-tr,])
 
 v <- sort(colSums(matrixdata1),decreasing=TRUE)
 plot(log(v))
 d <- data.frame(word = colnames(data[,-10001]),freq=v/sum(v))
-wordcloud(d$word,d$freq,scale=c(8,.5),max.words=100, random.order=FALSE)
+row.names(d)
+wordcloud(row.names(d),v,scale=c(8,.5),max.words=300, random.order=FALSE)
 plot(data[,10000],data[,10001])
 
 
@@ -26,7 +135,6 @@ data.tfidf1 <- tfidf.weight(matrixdata1)
 data.tfidf1 <- div.by.euc.length(data.tfidf1)
 
 dim(data.tfidf1)
-summary(colSums(data.tfidf1))
 
 #1. remove those words shorter than 3 characters
 
@@ -70,8 +178,18 @@ library(CORElearn)
 estReliefF <- attrEval("target.class1",datacomplete, estimator="ReliefFexpRank", ReliefIterations=500)
 featuresranking<-sort(estReliefF,decreasing=TRUE)
 
+View(as.data.frame(estReliefF))
 
+colnames(estReliefF)
+colnames(estReliefF)
+View(row.names(estReliefF))
+names(estReliefF)
 
+doTheCloud(datacomplete)
+
+pal <- brewer.pal(9, "BuGn")
+#pal <- pal[-(1:2)]
+wordcloud(names(estReliefF),estReliefF,scale=c(8,.3),max.words=300, random.order=FALSE,colors=pal)
 # MODELS  
 
 library(kernlab)
@@ -173,7 +291,7 @@ error.rate.test.Ondim3<-numeric(length(K))
 error.rate.harmonic3<-numeric(length(K))
 error.CV3<-numeric(length(K))
 #SV<-numeric(length(K))
-K=c(10,30,50,70,100,200,300,380,500) # dim size to use CV
+K=c(1000,1500,2000) # dim size to use CV
 (ntrees <- round(10^seq(1,4,by=0.4))) # ntrees posibilities
 
 
@@ -267,6 +385,10 @@ colnames(Testing.PCA.rf)<-c("OptN-trees","ErrorRateTest","OOBError", "Dim(PCs)")
 Testing.Relief.rf<-cbind(Cs4,error.rate.test.Ondim4,error.CV4,K)
 colnames(Testing.Relief.rf)<-c("OptN-trees","ErrorRateTest","OOBError","Dim(RankingRelief)")
 
+
+Testing.Relief.rf2<-cbind(Cs4,error.rate.test.Ondim4,error.CV4,K)
+colnames(Testing.Relief.rf2)<-c("OptN-trees","ErrorRateTest","OOBError","Dim(RankingRelief)")
+
 Testing.PCA.SVM
 Testing.Relief.SVM
 library(xtable)
@@ -275,3 +397,4 @@ import
 print(xtable(Testing.PCA.rf))
 
 print(xtable(Testing.Relief.rf))
+print(xtable(Testing.Relief.rf2))

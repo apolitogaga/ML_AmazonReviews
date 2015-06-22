@@ -3,7 +3,9 @@ library(TunePareto)
 library(tree)
 library(psych)
 library(MASS)
-
+library(wordcloud)
+library("tm")
+library(SnowballC)
 
 harm <- function (a,b) { 2/(1/a+1/b) }
 harmDiagProb <-function(x){
@@ -29,16 +31,49 @@ plot(wholeData)
 i=1
 ?matrix
 var = matrix(nrow=1500,ncol = 1)
-for(i in 1:10000) var[i] <- sum(wholeData[,i])
+var2=1
+for(i in 1:10000) var2[i] <- sum(wholeData[,i])
+plot(log(var2))
+
+wholeData[1:3,5928:5930]
+
+data1<-cbind(wholeData[1:3558], wholeData[10001])
+data2<-cbind(wholeData[3559:5927], wholeData[10001])
+data3<-cbind(wholeData[5928:6566], wholeData[10001])
+data4<-wholeData[6567:ncol(wholeData)]
+
+
+v <- sort(colSums(data2[-ncol(data2)]),decreasing=TRUE)
+plot(log(v))
+d <- data.frame(word = colnames(data2[,-nrow(data2)]),freq=v/sum(v))
+wordcloud(d$word,d$freq,scale=c(8,.5),max.words=100, random.order=FALSE)
+
+
+wordcloud(data3,d$freq,scale=c(8,.5),max.words=100, random.order=FALSE)
+doTheCloud <- function(data2,rand=FALSE){
+  v <- sort(colSums(data2[-ncol(data2)]),decreasing=TRUE)
+  pal2 <- brewer.pal(8,"Dark2")
+  d <- data.frame(word = colnames(data2[,-ncol(data2)]),freq=v/sum(v))
+  wordcloud(d$word,d$freq,scale=c(8,.3), random.order=rand, color=pal2)
+}
+
+doTheCloud(datacomplete, TRUE)
 
 
 
+doTheCloud(data1)
+doTheCloud(data2)
+doTheCloud(data3)
+doTheCloud(data4)
 
-sa<-wholeData[3550:3600]
-sb<-wholeData[5900:5950]
-sz<-wholeData[9320:9350]
+var=1
+for(i in 1:ncol(sz)) var[i] <- sum(sz[,i])
+plot(var)
+sum(sz[1])
 
-plot(as.matrix(var[5900:5950,]))
+sum(sz[2])
+sum(sz[3])
+
 var[6550:6600,]
 
 var<- as.data.frame(var)
